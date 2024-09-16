@@ -42,11 +42,12 @@ describe("Image history route", () => {
       message: null
     });
 
-    if (Array.isArray(res.body.data)) {
-      expect(res.body.data.length).toBeGreaterThan(0);
-      expect(res.body.data[0]).toHaveProperty('time');
-      expect(res.body.data[0]).toHaveProperty('image');
-      expect(res.body.data[0]).toHaveProperty('volume');
-    }
+    expect(Array.isArray(res.body.data)).toBe(true); 
+    expect(res.body.data.length).toBeGreaterThan(0);
+    
+    const firstItem = res.body.data[0];
+    expect(firstItem).toHaveProperty('time');
+    expect(firstItem).toHaveProperty('image');
+    expect(firstItem).toHaveProperty('volume');
   })
 })

@@ -1,19 +1,30 @@
-const app = require('./app');
-const connectDB = require('./config');
-const PORT = process.env.APP_PORT || 3000;
+const config = require('./config')[process.env.NODE_ENV || 'development'];
+const app = require('./app')(config);
+const http = require('http');
+const { connectToPostgres } = require('./database');
+// const { Server } = require('socket.io');
+
+const log = config.log()
+const PORT = config.app.port
+const server = http.createServer(app);
+// const io = new Server(server);
 
 const startServer = async () => {
   try {
-    await connectDB();
+    const postgresClient = await connectToPostgres();
+    config.postgres.client = postgresClient;
 
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+    await postgresClient.sync();
+
+    // for listener
+
+    server.listen(PORT, () => {
+      log.info(`Server is running on port ${PORT}`);
     });
-  }
-  catch (err) {
-    console.error('Failed to connect to the database', err);
+  } catch (err) {
+    log.error('Failed to start the server:', err);
     process.exit(1);
   }
-}
+};
 
 startServer();
