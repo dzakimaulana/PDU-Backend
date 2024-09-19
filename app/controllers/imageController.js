@@ -31,6 +31,17 @@ const uploadImage = async (req, res) => {
   }
 };
 
+const hello = async (req, res) => {
+  console.log('aduuhhhhhh');
+  res.status(200).json({
+    message: 'File uploaded successfully',
+    data: {
+      volume: 100
+    },
+  });
+};
+
 module.exports = {
   uploadImage,
+  hello,
 };

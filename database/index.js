@@ -13,7 +13,6 @@ const log = config.log();
 const connectToPostgres = async () => {
   try {
     await sequelize.authenticate();
-    console.log('Connection database success');
     log.info('Connection has been established successfully.');
     return sequelize;
   } catch (error) {
