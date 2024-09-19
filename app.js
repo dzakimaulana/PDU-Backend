@@ -1,9 +1,11 @@
 const express = require('express');
 const app = express();
-
 const cors = require('cors');
 const path = require('path');
+const multer = require('multer');
+
 const uploadRoutes = require('./app/routes/imageRoutes.js');
+const imageRoutes = require('./app/routes/imageRoutes');
 
 // Middleware untuk mengizinkan akses CORS (diperlukan untuk komunikasi dengan frontend)
 app.use(cors());
@@ -18,8 +20,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Routes
 app.use('/api', uploadRoutes);
 
+// Export konfigurasi app dengan logger
 module.exports = (config) => {
-  const log = config.log();
+  const { log } = config;
 
   if (app.get('env') === 'development') {
     app.use((req, res, next) => {
@@ -28,18 +31,20 @@ module.exports = (config) => {
     });
   }
 
-  // app.use(express.json());
-  // app.use('/api/images', imageRoutes);
+  // Route tambahan dari branch dev
+  app.use('/api/images', imageRoutes);
 
-  // eslint-disable-next-line no-unused-vars
+  // Error handling untuk file upload menggunakan multer
   app.use((error, req, res, next) => {
-    res.status(error.status || 500);
-    // Log out the error to the console
+    if (error instanceof multer.MulterError) {
+      if (error.code === 'LIMIT_FILE_SIZE') {
+        log.error('File size exceeds limit');
+        return res.status(400).send({ error: 'File size exceeds limit' });
+      }
+    }
     log.error(error);
-    return res.json({
-      error: {
-        message: error.message,
-      },
+    return res.status(error.status || 500).json({
+      message: 'Internal server error',
     });
   });
 
