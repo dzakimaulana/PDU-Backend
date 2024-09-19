@@ -8,8 +8,9 @@ const insertVolume = async (volume, time) => {
       time: time,
     });
     log.info('Record inserted successfully');
+    return { success: true };
   } catch (error) {
-    log.error('Error inserting record:', error);
+    return { success: false, message: `Error inserting record: ${error}` };
   }
 };
 

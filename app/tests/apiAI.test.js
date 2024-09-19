@@ -1,30 +1,31 @@
-const fetchAIResponse = require("../utils/apiAI")
-const fetch = require("node-fetch");
-jest.mock("node-fetch");
+const fetchAIResponse = require("../utils/apiAI");
+const app = require('../../app');
+const axios = require("axios");
 
-describe("Send image to AI", () => {
-  it("should return volume stone in that image", async () => {
-    const mockData = { success: true, data: { volume: 12 } };
-    const mockImageBuffer = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
+jest.mock("axios");
 
-    fetch.mockResolvedValue(new Response(JSON.stringify(mockData), { status: 200 }));
-    expect(fetch).toHaveBeenCalledWith('https://example-ai-api.com/endpoint', {
-      method: 'POST',
-      headers: {
-        'Content-Type': "image/png",
-      },
-      body: mockImageBuffer,
+describe('sendImage func', () => {
+  describe('When have correct requirement', () => {
+    it('should return volume', async() => {
+      const mockVolume = { volume: 100 };
+      axios.post.mockResolvedValue({ data: mockVolume });
+      
+      const response = await fetchAIResponse(app).post('/data');
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toEqual({ data: mockVolume });
     });
-
-    const result = await fetchAIResponse(mockImageBuffer);
-    expect(result).toEqual(mockData);
   });
+  describe('When AI give error', () => {
+    it('should return error message', async () => {
+      const mockError = { message: 'Error during calculation'};
 
-  it('should throw an error when fetch response is not ok', async () => {
-    const mockImageBuffer = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
+      axios.post.mockResolvedValue(mockError);
 
-    fetch.mockResolvedValue(new Response(null, { status: 500 }));
+      const response = await fetchAIResponse(app).post('/data');
 
-    await expect(fetchAIResponse(mockImageBuffer)).rejects.toThrow('Fetch failed: Network response was not ok');
+      expect(response.statuCode).toBe(400);
+      expect(response.body).toEqual(mockError);
+    });
   });
-})
+});

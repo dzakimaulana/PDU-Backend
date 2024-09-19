@@ -1,12 +1,19 @@
-const config = require('./config')[process.env.NODE_ENV || 'development'];
+require('dotenv').config();
+const config = require('../config')[process.env.NODE_ENV];
 const { Sequelize } = require('sequelize');
 
-const sequelize = new Sequelize(config.postgres.options);
+const sequelize = new Sequelize(config.postgres.options.database, 
+  config.postgres.options.user, 
+  config.postgres.options.password, {
+  host: config.postgres.options.host,
+  dialect: config.postgres.options.dialect,
+});
 const log = config.log();
 
 const connectToPostgres = async () => {
   try {
     await sequelize.authenticate();
+    console.log('Connection database success');
     log.info('Connection has been established successfully.');
     return sequelize;
   } catch (error) {

@@ -1,4 +1,4 @@
-const config = require('../config')[process.env.NODE_ENV || 'development'];
+const config = require('../../config')[process.env.NODE_ENV];
 
 const log = config.log();
 

@@ -1,11 +1,12 @@
+require('dotenv').config();
 const config = require('./config')[process.env.NODE_ENV || 'development'];
 const app = require('./app')(config);
 const http = require('http');
 const { connectToPostgres } = require('./database');
 // const { Server } = require('socket.io');
 
-const log = config.log()
-const PORT = config.app.port
+const log = config.log();
+const PORT = process.env.APP_PORT;
 const server = http.createServer(app);
 // const io = new Server(server);
 

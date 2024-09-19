@@ -25,3 +25,9 @@ Thumbs.db
 
 # Eslint
 .eslintcache
+
+# Coverage
+coverage/
+
+# Assets test
+assets/
