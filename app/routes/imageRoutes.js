@@ -1,9 +1,10 @@
 const express = require('express');
-const upload = require('../middlewares/uploadMiddleware');
-const imageController = require('../controllers/imageController');
+const router = express.Router();
+const upload = require('../middlewares/imageMiddleware');
+const uploadController = require('../controllers/imageController');
 
-const imageRoutes = express.Router();
+// Route untuk upload file
+router.post('/upload', upload.single('file'), uploadController.uploadImage);
 
-imageRoutes.post('/upload', upload.single('image'), imageController.uploadImage);
+module.exports = router;
 
-module.exports = imageRoutes;

@@ -1,7 +1,22 @@
 const express = require('express');
 const app = express();
 
-const imageRoutes = require('./routes/imageRoutes');
+const cors = require('cors');
+const path = require('path');
+const uploadRoutes = require('./app/routes/imageRoutes.js');
+
+// Middleware untuk mengizinkan akses CORS (diperlukan untuk komunikasi dengan frontend)
+app.use(cors());
+
+// Body parser
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Folder uploads untuk file gambar yang diupload
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Routes
+app.use('/api', uploadRoutes);
 
 module.exports = (config) => {
   const log = config.log();
@@ -13,8 +28,8 @@ module.exports = (config) => {
     });
   }
 
-  app.use(express.json());
-  app.use('/api/images', imageRoutes);
+  // app.use(express.json());
+  // app.use('/api/images', imageRoutes);
 
   // eslint-disable-next-line no-unused-vars
   app.use((error, req, res, next) => {

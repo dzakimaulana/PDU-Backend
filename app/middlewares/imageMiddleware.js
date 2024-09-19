@@ -1,26 +1,33 @@
-const multer = require("multer");
-const path = require("path");
+const multer = require('multer');
+const path = require('path');
 
-const storage = multer.memoryStorage();
-
-const fileFilter = (req, file, cb) => {
-  const allowedType = /jpg|jpeg|png/;
-  const extensionName = allowedType.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedType.test(file.mimetype);
-
-  if (extensionName && mimetype) {
-    cb(null, true);
-  } else {
-    cb(new Error("Only images with .jpg, .jpeg, or .png extensions are allowed"), false);
-  }
-}
-
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: {
-    fileSize: 500 * 1024 // 500 KB limit
-  }
+// Setup multer storage untuk menyimpan file
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // Nama file unik
+  },
 });
 
-module.exports = upload;
+// File filter: hanya menerima gambar
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+  if (!allowedTypes.includes(file.mimetype)) {
+    const error = new Error('Invalid file type');
+    error.status = 400;
+    return cb(error, false);
+  }
+  cb(null, true);
+};
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 1024 * 1024 * 5, 
+  },
+  fileFilter: fileFilter,
+});
+
+    module.exports = upload;
