@@ -14,4 +14,6 @@ const insertVolume = async (volume, time) => {
   }
 };
 
-module.exports = insertVolume;
+module.exports = {
+  insertVolume,
+};

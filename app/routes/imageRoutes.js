@@ -4,7 +4,7 @@ const imageController = require('../controllers/imageController');
 
 const imageRoutes = express.Router();
 
-imageRoutes.post('/upload', upload.single('image'), imageController.uploadImage);
+imageRoutes.post('/upload', upload.single('file'), imageController.uploadImage);
 imageRoutes.get('/', (req, res) => {
   res.send('Image route');
 });
