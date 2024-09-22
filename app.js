@@ -1,6 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const app = express();
+const fileUpload = require('express-fileupload');
 
 const imageRoutes = require('./app/routes/imageRoutes');
 
@@ -15,6 +16,7 @@ module.exports = (config) => {
   }
 
   app.use(express.json());
+  app.use(fileUpload());
   app.use('/api/images', imageRoutes);
 
   // 404 Not Found handler

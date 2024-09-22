@@ -32,8 +32,7 @@ describe("Insert volume", () => {
       time: time,
     });
 
-    const errorMock = "No Connection";
-    expect(log.error).toHaveBeenCalledWith(`Error inserting record: ${errorMock}`)
+    expect(log.error).toHaveBeenCalledWith(`Error inserting record: ${mockError.message}`)
     expect(result.success).toBe(false);
   });
 });

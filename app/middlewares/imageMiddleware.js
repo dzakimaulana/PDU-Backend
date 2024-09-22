@@ -1,28 +1,19 @@
-const multer = require("multer");
-const path = require("path");
-
-const storage = multer.memoryStorage();
-
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = ['image/jpeg', 'image/png'];
-  const extensionName = /\.(jpg|jpeg|png)$/i.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.includes(file.mimetype);
-
-  if (extensionName && mimetype) {
-    cb(null, true);
-  } else {
-    const error = new Error("Only images with .jpg, .jpeg, or .png extensions are allowed");
-    error.status = 400;
-    cb(error, false);
+const imageChecker = (req, res, next) => {
+  if (!req.files) {
+    return res.status(400).json({ message: 'No file was uploaded.' });
   }
+
+  const imageFile = req.files.file;
+  const allowedTypes = ['image/jpeg', 'image/png'];
+  if (!allowedTypes.includes(imageFile.mimetype)) {
+    return res.status(400).json({ message: 'Only JPEG and PNG files are allowed.' });
+  }
+
+  const allowedSize = 500 * 1024 // 500 KB
+  if (imageFile.size > allowedSize) {
+    return res.status(400).json({ message: 'File size exceeds 500KB limit.' });
+  }
+  next();
 }
 
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: {
-    fileSize: 500 * 1024 // 500 KB limit
-  }
-});
-
-module.exports = upload;
+module.exports = imageChecker;

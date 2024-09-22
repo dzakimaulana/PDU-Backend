@@ -1,6 +1,5 @@
-const multer = require('multer');
-const httpMocks = require('node-mocks-http'); // Ensure this is imported
-const upload = require('../middlewares/imageMiddleware');
+const httpMocks = require('node-mocks-http');
+const imageChecker = require('../middlewares/imageMiddleware'); // Adjust the path accordingly
 
 describe('Image Middleware', () => {
   let req, res, next;
@@ -12,51 +11,50 @@ describe('Image Middleware', () => {
   });
 
   describe('When image size is more than 500kb', () => {
-    it('should return error message', (done) => {
-      req.file = {
+    it('should return 400 if the file size exceeds 500KB', () => {
+      // Simulate a file larger than 500 KB
+      req.files.file = {
         originalname: 'largeImage.jpg',
         mimetype: 'image/jpeg',
-        size: 600 * 1024 // Simulate a 600 KB file
-      };
+        size: 600 * 1024 // Simulated size
+      }
 
-      upload.single('file')(req, res, (err) => {
-        expect(err).toEqual(expect.objectContaining({
-          message: 'File size exceeds the limit of 500 KB'
-        }));
-        done();
-      });
+      imageChecker(req, res, next);
+
+      expect(res.statusCode).toBe(400);
+      expect(res._getJSONData()).toEqual({ message: 'File size exceeds 500KB limit.' });
+      expect(next).not.toHaveBeenCalled();
     });
   });
 
   describe('When non-image file is uploaded', () => {
-    it('should return error message', (done) => {
-      req.file = {
+    it('should return 400 if the file type is not JPEG or PNG', () => {
+      // Simulate a non-image file
+      req.files.file = {
         originalname: 'test.php',
         mimetype: 'text/php',
-        size: 100 * 1024 // Simulate a valid file size
+        size: 100 * 1024 // Simulated size
       };
 
-      upload.single('file')(req, res, (err) => {
-        expect(err).toEqual(expect.objectContaining({
-          message: 'Only images with .jpg, .jpeg, or .png extensions are allowed'
-        }));
-        done();
-      });
+      imageChecker(req, res, next);
+
+      expect(res.statusCode).toBe(400);
+      expect(res._getJSONData()).toEqual({ message: 'Only JPEG and PNG files are allowed.' });
+      expect(next).not.toHaveBeenCalled();
     });
   });
 
-  describe('When image is valid and size is less than 500kb', () => {
-    it('should call next without errors', (done) => {
-      req.file = {
-        originalname: 'image.jpg',
+  describe('When a valid image is uploaded with size less than 500kb', () => {
+    it("should call next if the file is valid (PNG and within size limit)'", () => {
+      req.files.file = {
+        originalname: 'validImage.jpg',
         mimetype: 'image/jpeg',
-        size: 100 * 1024 // Simulate a valid file size
+        size: 100 * 1024 // Simulated valid size
       };
 
-      upload.single('file')(req, res, (err) => {
-        expect(err).toBeUndefined(); // No error should be passed to next
-        done();
-      });
+      imageChecker(req, res, next);
+
+      expect(next).toHaveBeenCalled();
     });
   });
 });

@@ -22,11 +22,11 @@ describe('Image Controller', () => {
       await uploadImage(req, res);
 
       expect(res.statusCode).toBe(400);
-      
+
       const responseData = JSON.parse(res._getData());
       expect(responseData).toEqual({
       message: 'No file uploaded',
-    });
+      });
     });
   });
 
