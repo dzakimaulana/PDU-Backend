@@ -11,7 +11,9 @@ const fileFilter = (req, file, cb) => {
   if (extensionName && mimetype) {
     cb(null, true);
   } else {
-    cb(new Error("Only images with .jpg, .jpeg, or .png extensions are allowed"), false);
+    const error = new Error("Only images with .jpg, .jpeg, or .png extensions are allowed");
+    error.status = 400;
+    cb(error, false);
   }
 }
 

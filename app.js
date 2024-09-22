@@ -17,34 +17,37 @@ module.exports = (config) => {
   app.use(express.json());
   app.use('/api/images', imageRoutes);
 
-  app.get('/', (req, res) => {
-    res.send('Hello, world!');
-  });
-
   // 404 Not Found handler
-  app.use((error, req, res, next) => {
+  app.all('*', (req, res) => {
     res.status(404).json({
-      message: error,
+      message: "Page not found"
     });
   });
 
-  // Error handling middleware
+  // Error Handler
   app.use((error, req, res, next) => {
-    if (error) {
-      if (error instanceof multer.MulterError) { 
-        if (error.code === 'LIMIT_FILE_SIZE') { 
-          log.error('File size exceeds limit');
-          return res.status(400).send({ error: 'File size exceeds limit' });
-        }
-      } else {
-        log.error(error);
-        return res.status(error.status || 500).json({
-          message: 'Internal server error',
-        });
-      }
-    }
-    next();
+    const statusCode = error.status || (error instanceof multer.MulterError ? 400 : 500);
+    return res.status(statusCode).json({
+      message: error.message || 'Internal Server Error'
+    });
   });
+
+  // // Error handling middleware
+  // app.use((error, req, res, next) => {
+  //   if (error) {
+  //     if (error instanceof multer.MulterError) { 
+  //       if (error.code === 'LIMIT_FILE_SIZE') { 
+  //         log.error('File size should not exceed 500 KB');
+  //         return res.status(400).send({ message: 'File size should not exceed 500 KB' });
+  //       }
+  //     }
+  //     if (error.message === 'Only images with .jpg, .jpeg, or .png extensions are allowed') {
+  //       return res.status(400).json({ message: error.message });
+  //     }
+  //     return res.status(500).json({ message: 'Internal server error', error: errror.message });
+  //   }
+  //   next();
+  // });
 
   return app;
 };

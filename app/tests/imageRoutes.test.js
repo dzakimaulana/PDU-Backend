@@ -1,14 +1,13 @@
 const request = require('supertest');
 const app = require('../../app');
-const path = require('path');
 
-describe('POST /api/image/upload', () => {
+describe('POST /api/images/upload', () => {
   describe('When file size exceeds 500 KB', () => {
     it('should return 400 and message', async () => {
-      const imagePath = path.join(__dirname, '..', '..', 'assets', 'tests', 'testFailed.jpg');
+      const imagePath = '../../assets/tests/testFailed.jpg';
 
       const response = await request(app)
-        .post('/api/image/upload')
+        .post('/api/images/upload')
         .attach('file', imagePath);
       
       expect(response.statusCode).toBe(400);
@@ -18,10 +17,10 @@ describe('POST /api/image/upload', () => {
 
   describe('When file is not an image format', () => {
     it('should return 400 and message', async () => {
-      const nonImagePath = path.join(__dirname, '..', '..', 'assets', 'tests', 'test.txt');
+      const nonImagePath = '../../assets/tests/test.txt'
 
       const response = await request(app)
-        .post('/api/image/upload')
+        .post('/api/images/upload')
         .attach('file', nonImagePath);
 
       expect(response.statusCode).toBe(400);
@@ -31,10 +30,11 @@ describe('POST /api/image/upload', () => {
 
   describe('When file is in image format and less than 500 KB', () => {
     it('should return 200 and success message', async () => {
-      const imagePath = path.join(__dirname, '..', '..', 'assets', 'tests', 'testSuccess.jpg');
+      const imagePath = '../../assets/tests/testSuccess.jpg';
+      console.log(imagePath);
 
       const response = await request(app)
-        .post('/api/image/upload')
+        .post('/api/images/upload')
         .attach('file', imagePath);
 
       expect(response.statusCode).toBe(200);

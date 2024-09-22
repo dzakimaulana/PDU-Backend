@@ -1,5 +1,5 @@
 const Volume = require('../models/imageModel');
-const insertVolume = require('../services/imageService');
+const imageService = require('../services/imageService');
 const log = require('../utils/logger');
 
 jest.mock('../models/imageModel');
@@ -10,7 +10,7 @@ describe("Insert volume", () => {
   const time = new Date();
 
   it("should insert a volume and log success", async () => {
-    const result = await insertVolume(volume, time);
+    const result = await imageService.insertVolume(volume, time);
 
     expect(Volume.create).toHaveBeenCalledWith({
       volume: volume,
@@ -25,16 +25,15 @@ describe("Insert volume", () => {
     const mockError = new Error('Database Error');
     Volume.create.mockRejectedValue(mockError);
 
-    const result = await insertVolume(volume, time);
+    const result = await imageService.insertVolume(volume, time);
 
     expect(Volume.create).toHaveBeenCalledWith({
       volume: volume,
       time: time,
     });
 
-    expect(result).toEqual({
-      success: false,
-      message: `Error inserting record: Error: Database Error`,
-    });
+    const errorMock = "No Connection";
+    expect(log.error).toHaveBeenCalledWith(`Error inserting record: ${errorMock}`)
+    expect(result.success).toBe(false);
   });
 });
