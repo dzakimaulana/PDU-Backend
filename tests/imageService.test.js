@@ -1,6 +1,6 @@
-const Volume = require('../models/imageModel');
-const imageService = require('../services/imageService');
-const log = require('../utils/logger');
+const Volume = require('../src/models/imageModel');
+const imageService = require('../src/services/volume');
+const log = require('../src/utils/logger');
 
 jest.mock('../models/imageModel');
 jest.mock('../utils/logger');
