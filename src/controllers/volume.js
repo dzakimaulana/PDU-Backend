@@ -9,10 +9,13 @@ const uploadImage = async (req, res) => {
         message: 'Error imageService in uploadImage',
       })
     }
-    
-    const volume = Math.floor(resultSA.data.batu_percentage);;
 
-    const result = await volumeService.insertVolume(volume);
+    const rockAreaPercentage = resultSA.data.rock_area_percentage;
+    // console.log(rockAreaPercentage);
+    // const volume = Math.floor(rockAreaPercentage);
+    // console.log(volume);
+
+    const result = await volumeService.insertVolume(rockAreaPercentage);
     if (!result.success) {
       return res.status(400).json({
         status: "error",
@@ -35,8 +38,9 @@ const uploadImage = async (req, res) => {
 
 const getAllVolume = async (req, res) => {
   try {
-    const limit = parseInt(req.params.limit, 10);
-    if (isNaN(limit) || limit <= 0) {
+    const limit = parseInt(req.query.limit, 10) || 10;
+    console.log(limit);
+    if (limit <= 0) {
       return res.status(400).json({
         status: "error",
         message: 'Invalid limit parameter. Must be a positive number.',

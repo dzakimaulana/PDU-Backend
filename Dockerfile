@@ -6,9 +6,9 @@ COPY package*.json ./
 
 RUN npm ci --only=production
 
-COPY ./src ./
+COPY ./src ./src
 
-RUN chown -R node:node /usr/src/app
+RUN chown -R node:node /usr/src/
 USER node
 
 ENV NODE_ENV=production

@@ -1,7 +1,7 @@
 
 const axios = require('axios');
 const FormData = require('form-data');
-require('dotenv').config;
+require('dotenv').config();
 
 const AI_ENDPOINT = process.env.AI_ENDPOINT;
 

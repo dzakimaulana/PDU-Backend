@@ -1,18 +1,18 @@
-require("dotenv").config;
-const { InfluxDB } = require('@influxdata/influxdb-client');
+require('dotenv').config();
 
-const url = process.env.INFLUX_URL;
-const token = process.env.INFLUX_TOKEN;
-const org = process.env.INFLUX_ORG;
-const bucket = process.env.INFLUX_BUCKET;
+const influxUrl = process.env.INFLUX_URL;
+const influxToken = process.env.INFLUX_TOKEN;
+const influxOrg = process.env.INFLUX_ORG;
+const influxBucket = process.env.INFLUX_BUCKET;
 
-const influxDB = new InfluxDB({ url, token })
-
-const writeApi = influxDB.getWriteApi(org, bucket)
-const queryApi = influxDB.getQueryApi(org)
+if (!influxUrl || !influxToken || !influxOrg || !influxBucket) {
+  throw new Error('Missing InfluxDB configuration in environment variables');
+}
 
 module.exports = {
-  writeApi,
-  queryApi,
-  bucket
+  influxUrl,
+  influxToken,
+  influxOrg,
+  influxBucket
 }
+
