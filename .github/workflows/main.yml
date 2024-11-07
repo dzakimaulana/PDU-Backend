@@ -27,7 +27,7 @@ jobs:
         context: ./
         file: ./Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/pdu-backend:latest
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/pdu-backend:latest
 
     - name: Log out from Docker Hub
       run: docker logout
