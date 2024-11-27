@@ -3,7 +3,9 @@ const axios = require('axios');
 const FormData = require('form-data');
 require('dotenv').config();
 
-const AI_ENDPOINT = process.env.AI_ENDPOINT;
+const { errorLogger, appLogger } = require('../config/logger');
+
+const AI_ENDPOINT = process.env.AI_ENDPOINT || "http://localhost:5000";
 
 const uploadImageToAI = async (imageFile) => {
   try {
@@ -14,15 +16,19 @@ const uploadImageToAI = async (imageFile) => {
     const formData = new FormData();
     formData.append('file', imageFile.data, imageFile.name);
 
-    const response = await axios.post(AI_ENDPOINT, formData, {
+    const response = await axios.post(`${AI_ENDPOINT}/process_image`, formData, {
       headers: {
         ...formData.getHeaders(),
       },
     });
+    appLogger.info('Hit AI endpoint');
 
     return { success: true, data: response.data };
   } catch (error) {
-    console.error(`Failed to upload image: ${error.message}`);
+    errorLogger.error({
+      message: error.message,
+      stack: error.stack
+    });
     return { success: false, message: error.message };
   }
 };
