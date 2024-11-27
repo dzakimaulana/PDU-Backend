@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const admin = require('firebase-admin');
 const serviceAccount = require(process.env.NODE_ENV === 'production' 
-  ? '/home/node/src/config/firebase/serviceAccountKey.json' 
+  ? '/app/src/config/firebase/serviceAccountKey.json' 
   : './serviceAccountKey.json');
 
 admin.initializeApp({
