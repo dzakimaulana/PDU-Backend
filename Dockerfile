@@ -1,21 +1,27 @@
-# Single stage build and runtime
-FROM node:20
+# Use a specific tag for reproducibility
+FROM node:20.5-slim
 
-# Set up working directory
-WORKDIR /home/node
+# Set working directory
+WORKDIR /app
 
-# Copy package.json and install dependencies
+# Copy package files and install production dependencies
 COPY package*.json ./
 RUN npm ci --only=production
 
-# Copy the rest of the application files
+# Copy application source code
 COPY . .
 
-# Create logs directory and set permissions
-RUN mkdir -p /home/node/logs && chown -R node:node /home/node/logs
+# Create logs directory with proper permissions
+RUN mkdir -p /app/logs && chmod -R 755 /app/logs
 
-# Set the user to node for security
+# Set environment variables
+ENV NODE_ENV=production
+
+# Expose the default application port (if applicable, e.g., 3000)
+EXPOSE 3000
+
+# Run the application using a non-root user for security
 USER node
 
-# Command to start the application
+# Start the application
 CMD ["node", "src/app.js"]

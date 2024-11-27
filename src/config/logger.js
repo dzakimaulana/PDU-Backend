@@ -14,7 +14,7 @@ const appLogger = winston.createLogger({
     transports: [
         consoleTransport,
         new winston.transports.File({ filename: process.env.NODE_ENV === 'production' 
-            ? '/home/node/logs/app.log'   // Production file path
+            ? '/app/logs/app.log'   // Production file path
             : './../../logs/app.log',
             format: winston.format.combine(
                 winston.format.timestamp(),
@@ -37,7 +37,7 @@ const accessLogger = winston.createLogger({
             ),
         }),
         new winston.transports.File({ filename: process.env.NODE_ENV === 'production' 
-            ? '/home/node/logs/access.log'
+            ? '/app/logs/access.log'
             : './../../logs/access.log', 
             format: winston.format.combine(
                 winston.format.timestamp(),
@@ -52,7 +52,7 @@ const errorLogger = winston.createLogger({
     transports: [
         consoleTransport,
         new winston.transports.File({ filename: process.env.NODE_ENV === 'production' 
-            ? '/home/node/logs/error.log'   // Production file path
+            ? '/app/logs/error.log'   // Production file path
             : './../../logs/error.log', 
             format: winston.format.combine(
                 winston.format.errors({stack: true}),
