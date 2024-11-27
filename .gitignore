@@ -31,3 +31,6 @@ coverage/
 
 # Assets test
 assets/
+
+# fiebrase key
+./src/config/fiebrase/serviceAccountKey.json

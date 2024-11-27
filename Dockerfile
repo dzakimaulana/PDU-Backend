@@ -9,7 +9,6 @@ COPY . .
 # runtime stage
 FROM node:20-alpine AS runtime
 RUN apk add --update nodejs
-RUN addgroup -S node && adduser -S node -G node
 USER node
 RUN mkdir /home/node/src
 RUN mkdir /home/node/logs
