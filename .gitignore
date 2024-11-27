@@ -33,4 +33,4 @@ coverage/
 assets/
 
 # fiebrase key
-./src/config/fiebrase/serviceAccountKey.json
+src/config/firebase/serviceAccountKey.json
