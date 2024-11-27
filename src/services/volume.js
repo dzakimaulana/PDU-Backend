@@ -1,7 +1,6 @@
 const { InfluxDB, Point } = require('@influxdata/influxdb-client');
-const { influxUrl, influxToken, influxOrg, influxBucket } = require('../config/influxdb');;
-
-console.log(influxUrl);
+const { influxUrl, influxToken, influxOrg, influxBucket } = require('../config/influxdb');
+const  { errorLogger, appLogger } = require('../config/logger');
 
 const influxDB = new InfluxDB({
   url: influxUrl,
@@ -11,17 +10,26 @@ const influxDB = new InfluxDB({
 const writeApi = influxDB.getWriteApi(influxOrg, influxBucket, 'ns');
 const queryApi = influxDB.getQueryApi(influxOrg);
 
-const insertVolume = async (value) => {
+const measurement = "Volume";
+
+const insertVolume = async (percentageArea, numberOfStones, imageURL) => {
   try {
-    const point = new Point('Volume')
-      .tag('manual', 'MV')
-      .floatField('value', value);
-
-    await writeApi.writePoint(point);
-
+    const point = new Point(measurement)
+      .tag('retrieve', 'manual')
+      .floatField('percentage_area', percentageArea)
+      .intField('number_of_stones', numberOfStones)
+      .stringField('image_url', imageURL);
+      
+    writeApi.writePoint(point);
+    await writeApi.flush();
+    appLogger.info('Store data to InfluxDB');
+    
     return { success: true };
   } catch (error) {
-    console.error(`Error writing data to InfluxDB: ${error.message}`);
+    errorLogger.error({
+      message: error.message,
+      stack: error.stack
+    });
     return { success: false, message: error.message };
   }
 };
@@ -31,8 +39,13 @@ const readVolume = async (limit = 10) => {
     const query = `
       from(bucket: "${influxBucket}")
       |> range(start: 0)
-      |> filter(fn: (r) => r["_measurement"] == "Volume")
-      |> filter(fn: (r) => r["_field"] == "value")
+      |> filter(fn: (r) => r["_measurement"] == "${measurement}")
+      |> pivot(
+          rowKey:["_time"],
+          columnKey: ["_field"],
+          valueColumn: "_value"
+        )
+      |> filter(fn: (r) => r["retrieve"] == "manual")
       |> sort(columns: ["_time"], desc: true)
       |> limit(n: ${limit})
     `;
@@ -45,7 +58,9 @@ const readVolume = async (limit = 10) => {
           const o = tableMeta.toObject(row);
           result.push({
             time: o._time,
-            volume: o._value
+            percentage_area: o.percentage_area,
+            number_of_stones: o.number_of_stones,
+            image_url: o.image_url
           });
         },
         error(error) {
@@ -53,19 +68,18 @@ const readVolume = async (limit = 10) => {
           reject({ success: false, message: error.message });
         },
         complete() {
-          console.log(result);
           resolve({ success: true, data: result });
         }
       });
     });
   } catch (error) {
-    console.error(`Error reading data from InfluxDB: ${error.message}`);
+    errorLogger.error({
+      message: error.message,
+      stack: error.stack
+    });
     return { success: false, message: error.message };
   }
 };
-
-
-
 
 module.exports = {
   insertVolume,

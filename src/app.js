@@ -1,19 +1,20 @@
 const express = require('express');
+const cors = require('cors');
 const fileUpload = require('express-fileupload');
-const { logger } = require('./config');
+
+const { appLogger, errorLogger } = require('./config/logger');
 const volumeRoutes = require('./routes/volume');
+const morganMiddleware = require('./middlewares/morganMiddleware');
 require('dotenv').config();
 
 const app = express();
 
-app.use((req, res, next) => {
-    logger.info(`${req.method} ${req.url}`);
-    next();
-});
-
+app.use(cors());
 app.use(fileUpload());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(morganMiddleware);
 
 // Routes
 app.use('/api/volumes', volumeRoutes);
@@ -27,10 +28,10 @@ app.use((req, res, next) => {
 });
 
 // Error handling
-app.use((err, req, res, next) => { // Add 'next' as the fourth parameter
-    logger.error({
+app.use((err, req, res, next) => {
+    errorLogger.error({
         message: err.message,
-        stack: err.stack, // Log the stack trace for debugging
+        stack: err.stack,
         statusCode: err.status || 500,
     });
 
@@ -42,5 +43,5 @@ app.use((err, req, res, next) => { // Add 'next' as the fourth parameter
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => logger.info(`Server running on port ${PORT}`));
+app.listen(PORT, () => appLogger.info(`Server running on port ${PORT}`));
 
